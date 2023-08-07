@@ -5,15 +5,26 @@ import CardButton from "../../components/Buttons/CardButton";
 
 const Home = () => {
   const [data, setData] = useState([]);
+  const [name, setName] = useState('')
+  const [names, setNames] = useState('Sitare', 'Terlale', 'Ramzi')
 
   useEffect(() => {
     axios.get("https://northwind.vercel.app/api/products").then((res) => {
       setData(res.data);
     });
   }, []);
-
+  
   const handleDelete = (id) => {
     axios.delete(`https://northwind.vercel.app/api/products/${id}`)
+    setData((data) => data.filter(item => item.id !== id))
+  }
+
+  const handlePost = () => {
+    axios.post(`https://northwind.vercel.app/api/products/`, {
+      name: name
+    })
+    setName('')
+    setData([...data, {name}])
   }
 
   return (
@@ -28,6 +39,10 @@ const Home = () => {
         }}
       >
         React Development Service
+      </div>
+      <div>
+        <input placeholder="Ad"  value={name} onChange={(e) => setName(e.target.value)}/>
+        <button onClick={() => handlePost()}>Add name</button>
       </div>
       <div style={{display:'flex', gap:20, flexWrap:'wrap',marginTop:20}}>
         {data &&
