@@ -2,30 +2,29 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import UserBox from "../../components/UserBox";
 import CardButton from "../../components/Buttons/CardButton";
+import { useDispatch, useSelector } from "react-redux";
+import { addPost, getCategoriesThunk } from "../../store/reducer/getSlice";
+import { _createPost } from "../../store/reducer/postSlice";
 
 const Home = () => {
-  const [data, setData] = useState([]);
-  const [name, setName] = useState('')
-  const [names, setNames] = useState('Sitare', 'Terlale', 'Ramzi')
+  const [name, setName] = useState("");
 
-  useEffect(() => {
-    axios.get("https://northwind.vercel.app/api/products").then((res) => {
-      setData(res.data);
-    });
-  }, []);
+  const data = useSelector((state) => state.getSlice.categories);
+
+  const dispatch = useDispatch();
   
+  useEffect(() => {
+    dispatch(getCategoriesThunk());
+  }, []);
+
   const handleDelete = (id) => {
-    axios.delete(`https://northwind.vercel.app/api/products/${id}`)
-    setData((data) => data.filter(item => item.id !== id))
-  }
+    axios.delete(`https://northwind.vercel.app/api/categories/${id}`);
+  };
 
   const handlePost = () => {
-    axios.post(`https://northwind.vercel.app/api/products/`, {
-      name: name
-    })
-    setName('')
-    setData([...data, {name}])
-  }
+    dispatch(_createPost({name}))
+    dispatch(addPost({name}))
+  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
@@ -41,17 +40,34 @@ const Home = () => {
         React Development Service
       </div>
       <div>
-        <input placeholder="Ad"  value={name} onChange={(e) => setName(e.target.value)}/>
+        <input
+          placeholder="Ad"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
         <button onClick={() => handlePost()}>Add name</button>
       </div>
-      <div style={{display:'flex', gap:20, flexWrap:'wrap',marginTop:20}}>
+      <div
+        style={{ display: "flex", gap: 20, flexWrap: "wrap", marginTop: 20 }}
+      >
         {data &&
-          data.map((item) => 
-            <div style={{padding:20, backgroundColor:'#f8f8f8', borderRadius:20, flexDirection:'column', alignItems:'center',justifyContent:'center', display:'flex'}}>
-            <UserBox item={item}/>
-            <CardButton text='Buy'/>
-            <CardButton text='Delete' klikle={() => handleDelete(item.id)}/>
-          </div>)}
+          data.map((item) => (
+            <div
+              style={{
+                padding: 20,
+                backgroundColor: "#f8f8f8",
+                borderRadius: 20,
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                display: "flex",
+              }}
+            >
+              <UserBox item={item} key={item.id} />
+              <CardButton text="Buy" />
+              <CardButton text="Delete" klikle={() => handleDelete(item.id)} />
+            </div>
+          ))}
       </div>
     </div>
   );
