@@ -5,7 +5,7 @@ export const getCategoriesThunk = createAsyncThunk(
   "api/categories",
   async () => {
     const response = await axios.get(
-      "https://northwind.vercel.app/api/categories/"
+      "http://localhost:3000/api/products"
     );
     return response.data;
   }
@@ -18,10 +18,10 @@ const getSlice = createSlice({
     addPost: (state, action) => {
       state.categories.push(action.payload);
     },
-    changeLike: (state, action) => {
-      let category = state.categories.find((p) => p.id == action.payload);
-      if (category != undefined) {
-        category.isLiked = !category.isLiked;
+    addWishlist: (state, action) => {
+      let product = state.products.find((p) => p.id == action.payload);
+      if (product != undefined) {
+        product.wishlist = !product.wishlist;
       }
     },
   },
@@ -30,7 +30,7 @@ const getSlice = createSlice({
       //GET
       .addCase(getCategoriesThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.categories = action.payload;
+        state.products = action.payload;
       })
       .addCase(getCategoriesThunk.pending, (state, action) => {
         state.loading = true;
@@ -41,6 +41,6 @@ const getSlice = createSlice({
       });
   },
 });
-export const { addPost } = getSlice.actions;
+export const { addPost,addWishlist } = getSlice.actions;
 
 export default getSlice.reducer;
